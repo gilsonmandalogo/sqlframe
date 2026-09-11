@@ -28,6 +28,7 @@ from sqlglot.schema import MappingSchema
 from sqlframe.base.catalog import _BaseCatalog
 from sqlframe.base.dataframe import BaseDataFrame
 from sqlframe.base.normalize import normalize_dict
+from sqlframe.base.scan_policy import ScanPolicy
 from sqlframe.base.readerwriter import _BaseDataFrameReader, _BaseDataFrameWriter
 from sqlframe.base.table import _BaseTable
 from sqlframe.base.udf import _BaseUDFRegistration
@@ -108,6 +109,9 @@ class _BaseSession(t.Generic[CATALOG, READER, WRITER, DF, TABLE, CONN, UDF_REGIS
             self.incrementing_id: int = 1
             self._last_loaded_file: t.Optional[str] = None
             self.temp_views: t.Dict[str, DF] = {}
+            self.scan_policy: t.Optional[ScanPolicy] = kwargs.pop("scan_policy", None)
+        elif "scan_policy" in kwargs:
+            self.scan_policy = kwargs.pop("scan_policy")
         if not self._has_connection or conn:
             self._connection = conn
         if not getattr(self, "schema", None) or schema:
